@@ -1,0 +1,23 @@
+{
+  "name": "ol-mock-external-gateway",
+  "version": "0.1.0",
+  "description": "Mock OpenLearning external payment gateway for QA program and course enrolment testing.",
+  "private": true,
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/rumanta/ol-mock-external-gateway.git"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jose": "^5.9.6"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
