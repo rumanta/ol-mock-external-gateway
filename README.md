@@ -63,16 +63,24 @@ Create your local environment file:
 cp .env.example .env
 ```
 
-Edit `.env`:
+The repository includes `.env.example` as a fill-in template. Copy it once, then edit `.env` on your machine. Keep `.env.example` committed, but never commit `.env`.
+
+For a first practice run, the important values are:
 
 ```env
 PORT=5678
 OPENLEARNING_JWKS_URL=https://qa.openlearning.com/.well-known/jwks.json/
 DRY_RUN=true
+DEFAULT_REDIRECT_URL=https://qa.openlearning.com/
+```
+
+For a real QA enrolment test, also fill in:
+
+```env
+DRY_RUN=false
 OPENLEARNING_API_BASE_URL=https://qa-api.openlearning.com/v2.2
 ASYNC_ENGINE_AUTH_HEADER_NAME=X-API-Key
 ASYNC_ENGINE_AUTH_HEADER_VALUE=<your QA API key>
-DEFAULT_REDIRECT_URL=https://qa.openlearning.com/
 ```
 
 Usually these can stay blank:
