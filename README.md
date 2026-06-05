@@ -4,6 +4,34 @@ A small local mock payment gateway for testing OpenLearning QA external gateway 
 
 This tool is for OpenLearning teammates who need to test external gateway enrolment without manually copying JWTs from webhook.site, decoding them in jwt.io, and then calling enrolment APIs by hand.
 
+This is a QA/demo tool. It is not a real payment processor and should not be used for production payments.
+
+## Must Read
+
+Read these sections if you only want to get the mock gateway running and test a payment flow.
+
+1. [What This Does](#what-this-does)
+2. [Requirements](#requirements)
+3. [First-Time Setup](#first-time-setup)
+4. [Run The Local Server](#run-the-local-server)
+5. [Expose It With ngrok](#expose-it-with-ngrok)
+6. [Add The Link In OpenLearning QA](#add-the-link-in-openlearning-qa)
+7. [Test A Program Or Course](#test-a-program-or-course)
+
+## Good To Know
+
+Read these sections when you need more detail, debugging help, or implementation context.
+
+1. [Features](#features)
+2. [Dry Run Versus Real Enrolment](#dry-run-versus-real-enrolment)
+3. [OpenLearning APIs Used](#openlearning-apis-used)
+4. [Payment JWT Fields](#payment-jwt-fields)
+5. [Local Endpoints](#local-endpoints)
+6. [Troubleshooting](#troubleshooting)
+7. [Safety Notes](#safety-notes)
+
+## What This Does
+
 The mock gateway acts like a payment provider:
 
 ```text
@@ -14,23 +42,16 @@ OpenLearning QA
   -> learner is enrolled in the program or course/class
 ```
 
-This is a QA/demo tool. It is not a real payment processor and should not be used for production payments.
+When a learner clicks enrol in OpenLearning QA, OpenLearning sends signed payment details to this mock gateway. The mock gateway verifies those details, shows a mock payment page, then enrols the learner after you click `Simulate successful payment`.
 
-## Features
+It supports:
 
-- Receives OpenLearning external gateway payment requests.
-- Verifies the signed JWT using the OpenLearning QA JWKS URL.
-- Shows a friendly mock payment page before enrolment is triggered.
-- Supports program enrolment.
-- Supports course/class enrolment.
-- Shows the decoded JWT JSON for debugging.
-- Shows the outgoing enrolment request JSON before it is sent.
-- Shows the OpenLearning QA API response JSON after enrolment.
-- Supports `DRY_RUN=true` so testers can inspect the flow without enrolling anyone.
-- Uses ngrok so OpenLearning QA can reach your local machine.
-- Disables the payment button and shows a loading spinner after it is clicked, so testers do not submit the same mock payment multiple times.
+- Program enrolment.
+- Course/class enrolment.
 
 ## Requirements
+
+You need:
 
 - Node.js 20 or newer.
 - npm.
@@ -92,7 +113,7 @@ ASYNC_ENGINE_COURSE_ENROL_URL=
 
 Use those override values only if you need to send requests to a non-standard endpoint.
 
-## Start The Local Server
+## Run The Local Server
 
 Run:
 
@@ -120,7 +141,7 @@ To quickly check common local ports:
 lsof -iTCP -sTCP:LISTEN -n -P | grep -E ':(3000|3001|5000|5173|5678|8000|8080|9000) '
 ```
 
-## Start ngrok
+## Expose It With ngrok
 
 In another terminal, run:
 
@@ -154,7 +175,7 @@ Then use:
 https://<your-reserved-domain>/payment/start
 ```
 
-## Configure OpenLearning QA
+## Add The Link In OpenLearning QA
 
 In OpenLearning QA:
 
@@ -175,33 +196,47 @@ Then configure the course, class, or program you are testing to use that externa
 
 If you cannot see the External Gateway settings, ask someone with institution admin access to configure it.
 
-## How To Test A Program
+## Test A Program Or Course
+
+For a program:
 
 1. Set up the external gateway on a QA program payment flow.
 2. Log in as a learner.
 3. Open the program landing page.
 4. Click the program enrol button.
-5. You should be redirected to the mock payment page.
-6. Confirm the page says `Program`.
-7. Review the learner, portal, program title, price, decoded JWT JSON, and outgoing enrolment request JSON.
-8. Click `Simulate successful payment`.
-9. Confirm the success page says the learner has been enrolled in the program.
-10. Return to OpenLearning and confirm the learner can access the program.
+5. Confirm the mock payment page says `Program`.
+6. Review the learner, portal, program title, price, decoded JWT JSON, and outgoing enrolment request JSON.
+7. Click `Simulate successful payment`.
+8. Confirm the success page says the learner has been enrolled in the program.
+9. Return to OpenLearning and confirm the learner can access the program.
 
-## How To Test A Course Or Class
+For a course or class:
 
 1. Set up the external gateway on a QA course/class payment flow.
 2. Log in as a learner.
 3. Open the course/class enrolment page.
 4. Click the enrol/join button.
-5. You should be redirected to the mock payment page.
-6. Confirm the page says `Course`.
-7. Review the learner, portal, course title, price, course ID, class ID, decoded JWT JSON, and outgoing enrolment request JSON.
-8. Click `Simulate successful payment`.
-9. Confirm the success page says the learner has been enrolled in the course.
-10. Return to OpenLearning and confirm the learner can access the course/class.
+5. Confirm the mock payment page says `Course`.
+6. Review the learner, portal, course title, price, course ID, class ID, decoded JWT JSON, and outgoing enrolment request JSON.
+7. Click `Simulate successful payment`.
+8. Confirm the success page says the learner has been enrolled in the course.
+9. Return to OpenLearning and confirm the learner can access the course/class.
 
 The `access_code` from the JWT is displayed for testers, but it is not sent to the enrolment endpoint. Course/class enrolment uses the `course` and `class` IDs from the signed JWT.
+
+## Features
+
+- Receives OpenLearning external gateway payment requests.
+- Verifies the signed JWT using the OpenLearning QA JWKS URL.
+- Shows a friendly mock payment page before enrolment is triggered.
+- Supports program enrolment.
+- Supports course/class enrolment.
+- Shows the decoded JWT JSON for debugging.
+- Shows the outgoing enrolment request JSON before it is sent.
+- Shows the OpenLearning QA API response JSON after enrolment.
+- Supports `DRY_RUN=true` so testers can inspect the flow without enrolling anyone.
+- Uses ngrok so OpenLearning QA can reach your local machine.
+- Disables the payment button and shows a loading spinner after it is clicked, so testers do not submit the same mock payment multiple times.
 
 ## Dry Run Versus Real Enrolment
 
@@ -223,7 +258,7 @@ ASYNC_ENGINE_AUTH_HEADER_VALUE=<your QA API key>
 
 Restart the server after changing `.env`.
 
-## Enrolment APIs Used
+## OpenLearning APIs Used
 
 OpenLearning QA API docs:
 
